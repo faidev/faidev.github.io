@@ -3,6 +3,29 @@
   
     
     <entry>
+      <title>OSX下iTerm2实现rz/sz与服务器进行文件上传/下载</title>
+      <link href="/iTerm2-lrzsz/"/>
+      <url>/iTerm2-lrzsz/</url>
+      
+        <content type="html"><![CDATA[<p>在windows下用xshell、secureCRT等工具只要在服务端装好lrzsz工具包就可以实现简单方便的文件上传下载。昨天在Mac上用iTerm的时候发现iTerm原生不支持rz/sz命令，也就是不支持Zmodem来进行文件传输。遂查了一下，发现解决办法还算简单，不过有点小坑。</p><h3 id="通过brew安装lrzsz"><a href="#通过brew安装lrzsz" class="headerlink" title="通过brew安装lrzsz"></a>通过brew安装lrzsz</h3><p>首先先假定你安装了Homebrew，然后我们通过它，先给Mac安装lrzsz。<br>在终端下输入brew install lrzsz，静等一会即可安装完毕。</p><h3 id="下载配置iTerm2的相关脚本"><a href="#下载配置iTerm2的相关脚本" class="headerlink" title="下载配置iTerm2的相关脚本"></a>下载配置iTerm2的相关脚本</h3><p>这一步，在给iTerm2加上相应配置前需要下载两个前人已经写好的脚本文件。</p><p>这里是下载地址，将iterm2-recv-zmodem.sh和iterm2-send-zmodem.sh下载到本机，然后将它们放到/usr/local/bin目录下。</p><p>如果你安装过wget，也可以在/usr/local/bin目录下直接执行：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">wget https://raw.githubusercontent.com/mmastrac/iterm2-zmodem/master/iterm2-send-zmodem.sh https://raw.githubusercontent.com/mmastrac/iterm2-zmodem/master/iterm2-recv-zmodem.sh</span><br></pre></td></tr></table></figure><p>然后我们将这两个文件赋予可执行权限：</p><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x /usr/local/bin/iterm2-send-zmodem.sh /usr/local/bin/iterm2-recv-zmodem.sh</span><br></pre></td></tr></table></figure><h3 id="配置iTerm2"><a href="#配置iTerm2" class="headerlink" title="配置iTerm2"></a>配置iTerm2</h3><p>找到iTerm2的配置项：iTerm2的Preferences-&gt; Profiles -&gt; Default -&gt; Advanced -&gt; Triggers的Edit按钮。</p><p>然后配置项如下：<br>| Regular Expression | Action | Parameters | Instant |<br>| — | — | — | — |<br>| rz waiting to receive.**B0100 | Run Silent Coprocess | /usr/local/bin/iterm2-send-zmodem.sh | checked |<br>| **B00000000000000 | Run Silent Coprocess | /usr/local/bin/iterm2-recv-zmodem.sh | checked |<br>尤其注意最后一项需要你将Instant选项勾上，否则将不生效</p><p>注意看图：<br><img src="2018/12/15450449970629.jpg" alt=""><br>至此结束。只要服务端也已经装好了lrzsz工具包便可以方便地通过rz\sz来进行文件上传下载了。</p>]]></content>
+      
+      
+      <categories>
+          
+          <category> 风马牛不相及 </category>
+          
+      </categories>
+      
+      
+        <tags>
+            
+            <tag> iTerm2，lrzsz </tag>
+            
+        </tags>
+      
+    </entry>
+    
+    <entry>
       <title>在iterm2中设置保存远程登录密码</title>
       <link href="/How-to-save-passwords-for-ssh-in-iterm2/"/>
       <url>/How-to-save-passwords-for-ssh-in-iterm2/</url>
