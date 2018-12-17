@@ -112,12 +112,12 @@
 <meta property="og:site_name" content="七厘米地遥望">
 <meta property="og:description" content="在windows下用xshell、secureCRT等工具只要在服务端装好lrzsz工具包就可以实现简单方便的文件上传下载。昨天在Mac上用iTerm的时候发现iTerm原生不支持rz/sz命令，也就是不支持Zmodem来进行文件传输。遂查了一下，发现解决办法还算简单，不过有点小坑。 通过brew安装lrzsz首先先假定你安装了Homebrew，然后我们通过它，先给Mac安装lrzsz。在终端下输">
 <meta property="og:locale" content="en">
-<meta property="og:image" content="https://fairydevil.com/iTerm2-lrzsz/2018/12/15450449970629.jpg">
-<meta property="og:updated_time" content="2018-12-17T11:15:27.091Z">
+<meta property="og:image" content="https://fairydevil.com/2018/12/15450449970629.jpg">
+<meta property="og:updated_time" content="2018-12-17T11:26:17.991Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="OSX下iTerm2实现rz&#x2F;sz与服务器进行文件上传&#x2F;下载">
 <meta name="twitter:description" content="在windows下用xshell、secureCRT等工具只要在服务端装好lrzsz工具包就可以实现简单方便的文件上传下载。昨天在Mac上用iTerm的时候发现iTerm原生不支持rz/sz命令，也就是不支持Zmodem来进行文件传输。遂查了一下，发现解决办法还算简单，不过有点小坑。 通过brew安装lrzsz首先先假定你安装了Homebrew，然后我们通过它，先给Mac安装lrzsz。在终端下输">
-<meta name="twitter:image" content="https://fairydevil.com/iTerm2-lrzsz/2018/12/15450449970629.jpg">
+<meta name="twitter:image" content="https://fairydevil.com/2018/12/15450449970629.jpg">
 
 
 
@@ -404,7 +404,7 @@
                 
               
 
-              <time title="Created: 2018-12-17 19:06:43 / Modified: 19:15:27" itemprop="dateCreated datePublished" datetime="2018-12-17T19:06:43+08:00">2018-12-17</time>
+              <time title="Created: 2018-12-17 19:06:43 / Modified: 19:26:17" itemprop="dateCreated datePublished" datetime="2018-12-17T19:06:43+08:00">2018-12-17</time>
             
 
             
@@ -469,8 +469,33 @@
 <p>然后我们将这两个文件赋予可执行权限：</p>
 <figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">chmod +x /usr/local/bin/iterm2-send-zmodem.sh /usr/local/bin/iterm2-recv-zmodem.sh</span><br></pre></td></tr></table></figure>
 <h3 id="配置iTerm2"><a href="#配置iTerm2" class="headerlink" title="配置iTerm2"></a>配置iTerm2</h3><p>找到iTerm2的配置项：iTerm2的Preferences-&gt; Profiles -&gt; Default -&gt; Advanced -&gt; Triggers的Edit按钮。</p>
-<p>然后配置项如下：<br>| Regular Expression | Action | Parameters | Instant |<br>| — | — | — | — |<br>| rz waiting to receive.**B0100 | Run Silent Coprocess | /usr/local/bin/iterm2-send-zmodem.sh | checked |<br>| **B00000000000000 | Run Silent Coprocess | /usr/local/bin/iterm2-recv-zmodem.sh | checked |<br>尤其注意最后一项需要你将Instant选项勾上，否则将不生效</p>
-<p>注意看图：<br><img src="2018/12/15450449970629.jpg" alt=""><br>至此结束。只要服务端也已经装好了lrzsz工具包便可以方便地通过rz\sz来进行文件上传下载了。</p>
+<p>然后配置项如下：</p>
+<table>
+<thead>
+<tr>
+<th>Regular Expression</th>
+<th>Action</th>
+<th>Parameters</th>
+<th>Instant</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>rz waiting to receive.**B0100</td>
+<td>Run Silent Coprocess</td>
+<td>/usr/local/bin/iterm2-send-zmodem.sh</td>
+<td>checked</td>
+</tr>
+<tr>
+<td>**B00000000000000</td>
+<td>Run Silent Coprocess</td>
+<td>/usr/local/bin/iterm2-recv-zmodem.sh</td>
+<td>checked</td>
+</tr>
+</tbody>
+</table>
+<p>尤其注意最后一项需要你将Instant选项勾上，否则将不生效</p>
+<p>注意看图：<br><img src="/2018/12/15450449970629.jpg" alt=""><br>至此结束。只要服务端也已经装好了lrzsz工具包便可以方便地通过rz\sz来进行文件上传下载了。</p>
 
       
     </div>
