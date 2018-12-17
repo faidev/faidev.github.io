@@ -1,0 +1,1607 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next pisces use-motion" lang="en">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=6.6.0" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=6.6.0">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=6.6.0">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=6.6.0" color="#222">
+
+
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Pisces',
+    version: '6.6.0',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="SAE自带的SaeMail限制比较多，不但附件有1M的大小限制，而且无法直接将zip文件发送邮箱，而通过第三方的类来发邮件，可以很好的解决这两个问题。 [PHP] 简易的SMTP邮件发送类 /*     简易的SMTP发送邮件类，代码比较少，有助于学习SMTP协议，     可以带附件，支持需要验证的SMTP服务器（目前的SMTP基本都需要验证）     编写: chenall     时间">
+<meta name="keywords" content="Wordpress">
+<meta property="og:type" content="article">
+<meta property="og:title" content="SAE数据库定时备份并发送至邮箱">
+<meta property="og:url" content="https://fairydevil.com/sae-scheduled-backup-database-and-send-to-email/index.html">
+<meta property="og:site_name" content="七厘米地遥望">
+<meta property="og:description" content="SAE自带的SaeMail限制比较多，不但附件有1M的大小限制，而且无法直接将zip文件发送邮箱，而通过第三方的类来发邮件，可以很好的解决这两个问题。 [PHP] 简易的SMTP邮件发送类 /*     简易的SMTP发送邮件类，代码比较少，有助于学习SMTP协议，     可以带附件，支持需要验证的SMTP服务器（目前的SMTP基本都需要验证）     编写: chenall     时间">
+<meta property="og:locale" content="en">
+<meta property="og:image" content="https://image.fairydevil.com/2014/12/mysql.jpg">
+<meta property="og:updated_time" content="2018-12-17T08:26:29.578Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="SAE数据库定时备份并发送至邮箱">
+<meta name="twitter:description" content="SAE自带的SaeMail限制比较多，不但附件有1M的大小限制，而且无法直接将zip文件发送邮箱，而通过第三方的类来发邮件，可以很好的解决这两个问题。 [PHP] 简易的SMTP邮件发送类 /*     简易的SMTP发送邮件类，代码比较少，有助于学习SMTP协议，     可以带附件，支持需要验证的SMTP服务器（目前的SMTP基本都需要验证）     编写: chenall     时间">
+<meta name="twitter:image" content="https://image.fairydevil.com/2014/12/mysql.jpg">
+
+
+
+
+
+
+  <link rel="canonical" href="https://fairydevil.com/sae-scheduled-backup-database-and-send-to-email/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>SAE数据库定时备份并发送至邮箱 | 七厘米地遥望</title>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+    .use-motion .motion-element,
+    .use-motion .brand,
+    .use-motion .menu-item,
+    .sidebar-inner,
+    .use-motion .post-block,
+    .use-motion .pagination,
+    .use-motion .comments,
+    .use-motion .post-header,
+    .use-motion .post-body,
+    .use-motion .collection-title { opacity: initial; }
+
+    .use-motion .logo,
+    .use-motion .site-title,
+    .use-motion .site-subtitle {
+      opacity: initial;
+      top: initial;
+    }
+
+    .use-motion .logo-line-before i { left: initial; }
+    .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope="" itemtype="http://schema.org/WebPage" lang="en">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope="" itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">七厘米地遥望</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="Toggle navigation bar">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>Home</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>Tags</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>Categories</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>Archives</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>Search</a>
+        </li>
+      
+    </ul>
+  
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="Searching..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+            
+
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope="" itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://fairydevil.com/sae-scheduled-backup-database-and-send-to-email/">
+
+    <span hidden itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wayne">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope="" itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="七厘米地遥望">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">SAE数据库定时备份并发送至邮箱
+
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+
+              
+                
+              
+
+              <time title="Created: 2014-12-22 16:32:16" itemprop="dateCreated datePublished" datetime="2014-12-22T16:32:16+08:00">2014-12-22</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">Edited on</span>
+                
+                <time title="Modified: 2018-12-17 16:26:29" itemprop="dateModified" datetime="2018-12-17T16:26:29+08:00">2018-12-17</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">In</span>
+              
+              
+                <span itemprop="about" itemscope="" itemtype="http://schema.org/Thing"><a href="/categories/博客相关/" itemprop="url" rel="index"><span itemprop="name">博客相关</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><img src="https://image.fairydevil.com/2014/12/mysql.jpg" alt="mysql" title="mysql"></p>
+<audio controls autoplay><br><source src="https://image.fairydevil.com/2014/12/Complicated-Vazquez_Sounds.mp3" type="audio/mpeg"><br></audio>
+
+<p>SAE自带的SaeMail限制比较多，不但附件有1M的大小限制，而且无法直接将zip文件发送邮箱，而通过第三方的类来发邮件，可以很好的解决这两个问题。</p>
+<h2 id="PHP-简易的SMTP邮件发送类"><a href="#PHP-简易的SMTP邮件发送类" class="headerlink" title="[PHP] 简易的SMTP邮件发送类"></a>[PHP] 简易的SMTP邮件发送类</h2><pre class="prettyprint">
+/*
+    简易的SMTP发送邮件类，代码比较少，有助于学习SMTP协议，
+    可以带附件，支持需要验证的SMTP服务器（目前的SMTP基本都需要验证）
+    编写: chenall
+    时间: 2012-12-04
+    网址: http://chenall.net/post/cs_smtp/
+    修订记录:
+        2012-12-08
+            添加AddURL函数，可以直接从某个网址上下载文件并作为附件发送。
+            修正由于发送人和接收人邮件地址没有使用"<>"126邮箱SMTP无法使用的问题。
+        2012-12-06
+            添加reset函数，重置连接，这样可以发送多个邮件。
+        2012-12-05
+           发送附件的代码整合到send函数中，减少变量的使用，快速输出，节省内存占用;
+        2012-12-04
+           第一个版本
+
+    使用方法:
+
+        1\. 初始化：连接到服务器（默认是QQ邮箱）
+           $mail = new cs_smtp('smtp.qq.com',25)
+           if ($mail->errstr) //如果连接出错
+               die($mail->errstr;
+        2\. 登录到服务器验证,如果失败返回FALSE;
+           if (!$mail->login('USERNAME','PASSWORD'))
+                die($mail->errstr;
+        3\. 添加附件如果不指定name自动从指定的文件中取文件名
+           $mail->AddFile($file,$name) //服务器上的文件，可以指定文件名;
+        4\. 发送邮件
+            $mail->send($to,$subject,$body)
+            $to 收件人，多个使用','分隔
+            $subject 邮件主题，可选。
+            $body  邮件主体内容，可选
+*/
+class cs_smtp
+{
+    private $CRLF = "\r\n";
+    private $from;
+    private $smtp = null;
+    private $attach = array();
+    public $debug = true;//调试开关
+    public $errstr = '';
+
+    function __construct($host='smtp.qq.com',$port = 25) {
+        if (empty($host))
+            die('SMTP服务器未指定!');
+        $this->smtp = fsockopen($host,$port,$errno,$errstr,5);
+        if (empty($this->smtp))
+        {
+            $this->errstr = '错误'.$errno.':'.$errstr;
+            return;
+        }
+        $this->smtp_log(fread($this->smtp, 515));
+        if (intval($this->smtp_cmd('EHLO '.$host)) != 250 && intval($this->smtp_cmd('HELO '.$host)))
+            return $this->errstr = '服务器不支持！';
+        $this->errstr = '';
+    }
+
+    private function AttachURL($url,$name)
+    {
+        $info = parse_url($url);
+        isset($info['port']) || $info['port'] = 80;
+        isset($info['path']) || $info['path'] = '/';
+        isset($info['query']) || $info['query'] = '';
+        $down = fsockopen($info['host'],$info['port'],$errno,$errstr,5);
+        if (!$down)
+            return false;
+        $out = "GET ".$info['path'].'?'.$info['query']." HTTP/1.1\r\n";
+        $out .="Host: ".$info['host']."\r\n";
+        $out .= "Connection: Close\r\n\r\n";
+        fwrite($down, $out);
+        $filesize = 0;
+        while (!feof($down)) {
+            $a = fgets($down,515);
+            if ($a == "\r\n")
+                break;
+            $a = explode(':',$a);
+            if (strcasecmp($a[0],'Content-Length') == 0)
+                $filesize = intval($a[1]);
+        }
+        $sendsize = 0;
+        echo "TotalSize: ".$filesize."\r\n";
+        $i = 0;
+        while (!feof($down)) {
+            $data = fread($down,0x2000);
+            $sendsize += strlen($data);
+            if ($filesize)
+            {
+                echo "$i Send:".$sendsize."\r";
+                ob_flush();
+                flush();
+            }
+            ++$i;
+            fwrite($this->smtp,chunk_split(base64_encode($data)));
+        }
+        echo "\r\n";
+        fclose($down);
+        return ($filesize>0)?$filesize==$sendsize:true;
+    }
+
+    function __destruct()
+    {
+        if ($this->smtp)
+            $this->smtp_cmd('QUIT');//发送退出命令
+    }
+
+    private function smtp_log($msg)//即时输出调试使用
+    {
+        if ($this->debug == false)
+            return;
+        echo $msg."\r\n";
+        ob_flush();
+        flush();
+    }
+
+    function reset()
+    {
+        $this->attach = null;
+        $this->smtp_cmd('RSET');
+    }
+
+    function smtp_cmd($msg)//SMTP命令发送和收收
+    {
+        fputs($this->smtp,$msg.$this->CRLF);
+        $this->smtp_log('SEND:'. substr($msg,0,80));
+        $res = fread($this->smtp, 515);
+        $this->smtp_log($res);
+        $this->errstr = $res;
+        return $res;
+    }
+
+    function AddURL($url,$name)
+    {
+        $this->attach[$name] = $url;
+    }
+
+    function AddFile($file,$name = '')//添加文件附件
+    {
+        if (file_exists($file))
+        {
+            if (!empty($name))
+                return $this->attach[$name] = $file;
+            $fn = pathinfo($file);
+            return $this->attach[$fn['basename']] = $file;
+        }
+        return false;
+    }
+
+    function send($to,$subject='',$body = '')
+    {
+        $this->smtp_cmd("MAIL FROM: <".$this->from.'>');
+        $mailto = explode(',',$to);
+        foreach($mailto as $email_to)
+            $this->smtp_cmd("RCPT TO: <".$email_to.">");
+        if (intval($this->smtp_cmd("DATA")) != 354)//正确的返回必须是354
+            return false;
+        fwrite($this->smtp,"To:$to\nFrom: ".$this->from."\nSubject: $subject\n");
+
+        $boundary = uniqid("--BY_CHENALL_",true);
+        $headers = "MIME-Version: 1.0".$this->CRLF;
+        $headers .= "From: <".$this->from.">".$this->CRLF;
+        $headers .= "Content-type: multipart/mixed; boundary= $boundary\n\n".$this->CRLF;//headers结束要至少两个换行
+        fwrite($this->smtp,$headers);
+
+        $msg = "--$boundary\nContent-Type: text/html;charset=\"ISO-8859-1\"\nContent-Transfer-Encoding: base64\n\n";
+        $msg .= chunk_split(base64_encode($body));
+        fwrite($this->smtp,$msg);
+        $files = '';
+        $errinfo = '';
+        foreach($this->attach as $name=>$file)
+        {
+            $files .= $name;
+            $msg = "--$boundary\n--$boundary\n";
+            $msg .= "Content-Type: application/octet-stream; name=\"".$name."\"\n";
+            $msg .= "Content-Disposition: attachment; filename=\"".$name."\"\n";
+            $msg .= "Content-transfer-encoding: base64\n\n";
+            fwrite($this->smtp,$msg);
+            if (substr($file,4,1) == ':')//URL like http:///file://
+            {
+                if (!$this->AttachURL($file,$name))
+                    $errinfo .= '文件下载错误:'.$name.",文件可能是错误的\r\n$file";
+            }
+            else
+                fwrite($this->smtp,chunk_split(base64_encode(file_get_contents($file))));//使用BASE64编码，再用chunk_split大卸八块（每行76个字符）
+        }
+        if (!empty($errinfo))
+        {
+            $msg = "--$boundary\n--$boundary\n";
+            $msg .= "Content-Type: application/octet-stream; name=Error.log\n";
+            $msg .= "Content-Disposition: attachment; filename=Error.log\n";
+            $msg .= "Content-transfer-encoding: base64\n\n";
+            fwrite($this->smtp,$msg);
+            fwrite($this->smtp,chunk_split(base64_encode($errinfo)));
+        }
+        return intval($this->smtp_cmd("--$boundary--\n\r\n.")) == 250;//结束DATA发送，服务器会返回执行结果，如果代码不是250则出错。
+    }
+
+    function login($su,$sp)
+    {
+        if (empty($this->smtp))
+            return false;
+        $res = $this->smtp_cmd("AUTH LOGIN");
+        if (intval($res)>400)
+            return !$this->errstr = $res;
+        $res = $this->smtp_cmd(base64_encode($su));
+        if (intval($res)>400)
+            return !$this->errstr = $res;
+        $res = $this->smtp_cmd(base64_encode($sp));
+        if (intval($res)>400)
+            return !$this->errstr = $res;
+        $this->from = $su;
+        return true;
+    }
+}
+</".$this-></".$email_to."></".$this-></pre>
+
+<p><strong>完善后的代码共有4个文件，比较多，就不贴源文件了，直接下载吧。</strong></p>
+<p><div class="button"><br>  <a href="https://image.fairydevil.com/2014/12/db_backup.zip" target="_blank" rel="noopener">Download</a></div></p>
+<p>click to begin</p>
+<p>6K db_backup.zip</p>
+<p><br>将下载后将文件夹放到代码路径下（文件夹名字可以自由修改），然后修改里面db_config.php中的配置，主要是邮箱和一些备份信息的设定；接着在网站代码根目录的config.yaml文件中添加一个cron任务，让备份可以自动定时执行。可以根据自己的需要设计，具体语法可以参考官网的文档。我的设置如下：</p>
+<p><pre class="prettyprint"><br>handle:</pre></p>
+<pre><code>- passwdaccess:  if(path ~ &quot;db_backup/db_callback.php&quot;) passwd &quot;user:passwd&quot;
+</code></pre><p>cron:  </p>
+<pre><code>- description: SAE database backup
+  url: db_backup/db_callback.php
+  schedule: every day of month 04:00
+  login: user@passwd
+</code></pre><p><br>这样，在每天凌晨的4点就会进行自动备份。<br>OK，完工，去Storage看看吧，所有的备份数据均在那里，是不是心里踏实了许多。<br>（温馨提示：目前DeferredJob每天只能执行10次）</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Wordpress/" rel="tag"># Wordpress</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/sae-scheduled-backup-database/" rel="next" title="SAE数据库定时备份">
+                <i class="fa fa-chevron-left"></i> SAE数据库定时备份
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/childhood-is-gone/" rel="prev" title="我就是宅！ 看这之前请认清童年已毁的事实">
+                我就是宅！ 看这之前请认清童年已毁的事实 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope="" itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wayne</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">101</span>
+                    <span class="site-state-item-name">posts</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  <a href="/categories/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">5</span>
+                    <span class="site-state-item-name">categories</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  <a href="/tags/index.html">
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">94</span>
+                    <span class="site-state-item-name">tags</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#PHP-简易的SMTP邮件发送类"><span class="nav-number">1.</span> <span class="nav-text">[PHP] 简易的SMTP邮件发送类</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wayne</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Pisces</a> v6.6.0</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+
+  
+
+
+  <script src="/js/src/utils.js?v=6.6.0"></script>
+
+  <script src="/js/src/motion.js?v=6.6.0"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/src/affix.js?v=6.6.0"></script>
+
+  <script src="/js/src/schemes/pisces.js?v=6.6.0"></script>
+
+
+
+  
+  <script src="/js/src/scrollspy.js?v=6.6.0"></script>
+<script src="/js/src/post-details.js?v=6.6.0"></script>
+
+
+
+  
+
+
+  <script src="/js/src/bootstrap.js?v=6.6.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url);
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x" /></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x" /></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
